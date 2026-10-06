@@ -379,7 +379,8 @@
               id="manuscriptId" required></div>
           <div class="form-field"><label for="authorName">Author Name <span class="required">*</span></label><input
               id="authorName" required></div>
-          <div class="form-field full"><label for="coAuthors">Co-Author(s)</label><textarea id="coAuthors" placeholder="Enter co-author names, one per line or separated by commas"></textarea></div>
+          <div class="form-field full"><label for="coAuthors">Co-Author(s)</label><textarea id="coAuthors"
+              placeholder="Enter co-author names, one per line or separated by commas"></textarea></div>
           <div class="form-field full"><label for="title">Article / Manuscript Title <span
                 class="required">*</span></label><textarea id="title" required></textarea></div>
           <div class="form-field"><label for="affiliation">Affiliation / Institution</label><input id="affiliation">
@@ -437,7 +438,8 @@
             <span class="label">Affiliation:</span><span id="affiliationText"></span>
           </div>
           <div class="field" id="doiRow" style="display:none;">
-            <span class="label">DOI:</span><a id="doiText" href="#" target="_blank" rel="noopener" style="color:#1d5f78;text-decoration:none;word-break:break-all;"></a>
+            <span class="label">DOI:</span><a id="doiText" href="#" target="_blank" rel="noopener"
+              style="color:#1d5f78;text-decoration:none;word-break:break-all;"></a>
           </div>
         </div>
         <p class="publication-details"><strong>Publication Details:</strong> Volume <span id="volumeText"></span>, Issue
@@ -535,11 +537,12 @@
         const pdf = new jsPDF({
           orientation: 'portrait',
           unit: 'mm',
-          format: 'a4'
+          format: 'a4',
+          compress: true
         });
 
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 210, 297);
-        pdf.save((value('manuscriptId') || 'JAMS') + '_Acceptance_Letter.pdf');
+        const imageData = canvas.toDataURL('image/jpeg', 0.58);
+        pdf.addImage(imageData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
       } catch (err) {
         console.error(err);
         alert('PDF download could not load. Your print dialog will open; choose “Save as PDF”.');
