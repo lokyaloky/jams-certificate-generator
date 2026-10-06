@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JAMS Certificate Verification</title>
+<style>
+body{margin:0;background:#eef2f5;color:#25344b;font-family:Arial,Helvetica,sans-serif}.wrap{max-width:850px;margin:60px auto;padding:25px}.card{background:#fff;padding:38px;border-radius:10px;box-shadow:0 5px 25px rgba(20,42,72,.15);border-top:5px solid #173d70;text-align:center}.logo{width:80px;height:80px;object-fit:contain}.title{font:700 28px Georgia,serif;color:#173d70}.ok{color:#176b3a}.bad{color:#a5332b}.details{margin:25px auto;max-width:650px;text-align:left;border:1px solid #d5dce3;border-radius:6px;overflow:hidden}.row{display:flex;padding:12px 15px;border-bottom:1px solid #e7ebef}.row:last-child{border:0}.label{width:180px;font-weight:bold;color:#173d70}.value{flex:1}.btn{display:inline-block;background:#173d70;color:#fff;text-decoration:none;padding:11px 18px;border-radius:4px;margin-top:15px}.note{color:#657486;font-size:13px;margin-top:20px}
+</style></head><body><div class="wrap"><div class="card">
+<img class="logo" src="https://jamsjournal.org/public/journals/1/pageHeaderLogoImage_en.png" alt="JAMS">
+<div class="title">Certificate Verification</div><h2 id="status">Checking certificate...</h2><div id="content"></div>
+<div class="note">Journal of Advanced Multidisciplinary Studies (JAMS) · www.jamsjournal.org</div>
+</div></div>
+<script>
+function decode(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return JSON.parse(decodeURIComponent(escape(atob(s))))}
+const el=document.getElementById('status'), box=document.getElementById('content');
+try{
+ const d=new URLSearchParams(location.search).get('data'); if(!d) throw Error('No certificate data found.'); const x=decode(d);
+ el.textContent='✓ Certificate is valid';el.className='ok';
+ const rows=[['Certificate ID',x.id],['Recipient',x.recipient],['Certificate Type',x.type],['Issued Date',x.issuedDate],['Review Date',x.reviewDate||'-'],['Manuscript ID',x.manuscriptId||'-'],['Article Title',x.articleTitle||'-'],['Institution / Affiliation',x.affiliation||'-'],['Publication',[(x.publicationYear||''),(x.publicationMonth||'')].filter(Boolean).join(' ')||'-'],['Volume / Issue',[x.volume||'',x.issue||''].filter(Boolean).join(' / ')||'-']];
+ box.innerHTML='<div class="details">'+rows.map(r=>'<div class="row"><div class="label">'+esc(r[0])+'</div><div class="value">'+esc(r[1])+'</div></div>').join('')+'</div>';
+}catch(e){el.textContent='✕ Certificate could not be verified';el.className='bad';box.innerHTML='<p>'+esc(e.message||'Invalid verification link.')+'</p><a class="btn" href="index.html">Create Certificate</a>}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+</script></body></html>
