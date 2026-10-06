@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAMS Peer Review Evaluation Form</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:25px;background:#eef2f7;font-family:Arial,Helvetica,sans-serif;color:#222}
+.container{max-width:1100px;margin:auto;background:#fff;padding:30px;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.1)}
+.header{text-align:center;border-bottom:2px solid #123a70;padding-bottom:15px;margin-bottom:20px}
+.header h1{margin:0;color:#123a70;font-size:24px}
+.header h2{margin:4px 0;font-size:18px}
+.header h3{margin:8px 0;font-size:17px;text-decoration:underline}
+.header p{margin:4px;color:#356aa0;font-size:13px}
+.section-title{color:#123a70;font-size:17px;font-weight:bold;margin:18px 0 8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column}
+.field.full{grid-column:1/-1}
+label{font-size:13px;font-weight:bold;margin-bottom:5px}
+.required{color:#c62828}
+input,textarea{width:100%;border:1px solid #b8c2cc;border-radius:5px;padding:9px 10px;font-size:13px;font-family:Arial,Helvetica,sans-serif;outline:none}
+input:focus,textarea:focus{border-color:#123a70}
+input[readonly]{background:#f1f4f8;color:#555}
+textarea{resize:vertical;min-height:100px}
+.rating-wrap{overflow-x:auto}
+.rating-table{width:100%;border-collapse:collapse;font-size:12px}
+.rating-table th,.rating-table td{border:1px solid #8b949e;padding:8px 5px;text-align:center}
+.rating-table th{background:#eef1f4;font-weight:bold}
+.rating-table td:first-child{text-align:left;font-weight:600;min-width:210px}
+.rating-table input[type=radio]{width:16px;height:16px;cursor:pointer}
+.comments-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.comments-grid .full{grid-column:1/-1}
+.recommendation{width:100%;border-collapse:collapse}
+.recommendation td{border:1px solid #8b949e;padding:9px}
+.recommendation input{width:18px;height:18px;vertical-align:middle;margin-right:8px}
+.declaration{background:#f5f7fa;border:1px solid #ccd4dd;padding:12px;margin-top:18px;font-size:12px;line-height:1.5}
+.buttons{display:flex;justify-content:center;gap:12px;margin-top:25px}
+button{border:0;border-radius:6px;padding:13px 25px;font-size:14px;font-weight:bold;cursor:pointer}
+.generate{background:#123a70;color:#fff}.clear{background:#e8edf3;color:#222}
+button:hover{opacity:.9}
+@media(max-width:700px){
+ body{padding:10px}.container{padding:18px}.grid,.comments-grid{grid-template-columns:1fr}
+ .field.full,.comments-grid .full{grid-column:auto}.header h1{font-size:19px}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="header">
+<h1>JOURNAL OF ADVANCED MULTIDISCIPLINARY STUDIES</h1>
+<h2>(JAMS)</h2>
+<h3>Peer Review Evaluation Form</h3>
+<p>Website: https://jamsjournal.org</p>
+<p>Email: info@jamsjournal.org</p>
+</div>
+
+<div class="section-title">Manuscript Information</div>
+
+<div class="grid">
+<div class="field">
+<label>Article ID <span class="required">*</span></label>
+<input type="text" id="articleId" placeholder="JAMS-2026-236">
+</div>
+
+<div class="field">
+<label>Submission Date <span class="required">*</span></label>
+<input type="date" id="submissionDate">
+</div>
+
+<div class="field full">
+<label>Paper Title <span class="required">*</span></label>
+<input type="text" id="paperTitle" placeholder="Enter manuscript title">
+</div>
+
+<div class="field">
+<label>Authors Name</label>
+<input type="text" id="authorsName">
+</div>
+
+<div class="field">
+<label>Corresponding Author</label>
+<input type="text" id="correspondingAuthor">
+</div>
+
+<div class="field">
+<label>Review Date</label>
+<input type="date" id="reviewDate" readonly>
+</div>
+</div>
+
+<div class="section-title">Evaluation Criteria</div>
+
+<div class="rating-wrap">
+<table class="rating-table">
+<thead><tr>
+<th>Criteria</th><th>Outstanding</th><th>Excellent</th><th>Very Good</th><th>Good</th><th>Fair</th><th>Poor</th>
+</tr></thead>
+<tbody>
+<tr><td>Originality</td>
+<td><input type="radio" name="originality" value="Outstanding"></td><td><input type="radio" name="originality" value="Excellent"></td><td><input type="radio" name="originality" value="Very Good"></td><td><input type="radio" name="originality" value="Good"></td><td><input type="radio" name="originality" value="Fair"></td><td><input type="radio" name="originality" value="Poor"></td></tr>
+<tr><td>Technical Quality</td>
+<td><input type="radio" name="technical" value="Outstanding"></td><td><input type="radio" name="technical" value="Excellent"></td><td><input type="radio" name="technical" value="Very Good"></td><td><input type="radio" name="technical" value="Good"></td><td><input type="radio" name="technical" value="Fair"></td><td><input type="radio" name="technical" value="Poor"></td></tr>
+<tr><td>Presentation & Organization</td>
+<td><input type="radio" name="presentation" value="Outstanding"></td><td><input type="radio" name="presentation" value="Excellent"></td><td><input type="radio" name="presentation" value="Very Good"></td><td><input type="radio" name="presentation" value="Good"></td><td><input type="radio" name="presentation" value="Fair"></td><td><input type="radio" name="presentation" value="Poor"></td></tr>
+<tr><td>Language Quality</td>
+<td><input type="radio" name="language" value="Outstanding"></td><td><input type="radio" name="language" value="Excellent"></td><td><input type="radio" name="language" value="Very Good"></td><td><input type="radio" name="language" value="Good"></td><td><input type="radio" name="language" value="Fair"></td><td><input type="radio" name="language" value="Poor"></td></tr>
+<tr><td>References</td>
+<td><input type="radio" name="references" value="Outstanding"></td><td><input type="radio" name="references" value="Excellent"></td><td><input type="radio" name="references" value="Very Good"></td><td><input type="radio" name="references" value="Good"></td><td><input type="radio" name="references" value="Fair"></td><td><input type="radio" name="references" value="Poor"></td></tr>
+<tr><td>Practical Applicability</td>
+<td><input type="radio" name="practical" value="Outstanding"></td><td><input type="radio" name="practical" value="Excellent"></td><td><input type="radio" name="practical" value="Very Good"></td><td><input type="radio" name="practical" value="Good"></td><td><input type="radio" name="practical" value="Fair"></td><td><input type="radio" name="practical" value="Poor"></td></tr>
+<tr><td>Overall Quality</td>
+<td><input type="radio" name="overall" value="Outstanding"></td><td><input type="radio" name="overall" value="Excellent"></td><td><input type="radio" name="overall" value="Very Good"></td><td><input type="radio" name="overall" value="Good"></td><td><input type="radio" name="overall" value="Fair"></td><td><input type="radio" name="overall" value="Poor"></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="section-title">Reviewer Comments</div>
+<div class="comments-grid">
+<div class="field"><label>Strengths</label><textarea id="strengths" placeholder="Describe the major strengths of the manuscript..."></textarea></div>
+<div class="field"><label>Weaknesses</label><textarea id="weaknesses" placeholder="Mention areas that require improvement..."></textarea></div>
+<div class="field full"><label>Suggestions for Improvement</label><textarea id="suggestions" placeholder="Provide constructive suggestions to the authors..."></textarea></div>
+</div>
+
+<div class="section-title">Final Recommendation</div>
+<table class="recommendation">
+<tr><td>Accept</td><td><input type="radio" name="recommendation" value="Accept"> Select</td></tr>
+<tr><td>Accept with Minor Revisions</td><td><input type="radio" name="recommendation" value="Accept with Minor Revisions"> Select</td></tr>
+<tr><td>Major Revisions Required</td><td><input type="radio" name="recommendation" value="Major Revisions Required"> Select</td></tr>
+<tr><td>Resubmit after Revision</td><td><input type="radio" name="recommendation" value="Resubmit after Revision"> Select</td></tr>
+<tr><td>Reject</td><td><input type="radio" name="recommendation" value="Reject"> Select</td></tr>
+</table>
+
+<div class="section-title">Additional Confidential Comments to the Editor</div>
+<textarea id="confidential" placeholder="Optional comments for the Editor only..."></textarea>
+
+<div class="declaration">
+<strong>Reviewer Declaration:</strong>
+I confirm that this review represents my independent academic assessment of the manuscript and that I have no conflict of interest that would affect my recommendation.
+</div>
+
+<div class="buttons">
+<button class="clear" onclick="clearForm()">Clear Form</button>
+<button class="generate" onclick="generatePDF()">Generate & Download PDF</button>
+</div>
+
+</div>
+
+<script>
+const { jsPDF } = window.jspdf;
+
+function getToday(){
+    const d=new Date();
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+    document.getElementById("reviewDate").value=getToday();
+});
+
+function value(id){
+    return document.getElementById(id).value.trim();
+}
+
+function radioValue(name){
+    const el=document.querySelector('input[name="'+name+'"]:checked');
+    return el ? el.value : "";
+}
+
+function formatDate(date){
+    if(!date) return "";
+    const p=date.split("-");
+    return p.length===3 ? p[2]+"-"+p[1]+"-"+p[0] : date;
+}
+
+/*
+  Professional dynamic PDF engine:
+  - A4
+  - 9 pt body
+  - automatic page breaks
+  - no fixed-height comment boxes
+  - no slice() / truncation
+  - paragraphs continue naturally across pages
+*/
+
+const PAGE_W=210;
+const PAGE_H=297;
+const LEFT=15;
+const RIGHT=15;
+const CONTENT_W=180;
+const TOP=35;
+const BOTTOM=282;
+
+const NAVY=[18,58,112];
+const BLUE=[63,111,168];
+const LIGHT=[234,241,248];
+const BORDER=[145,153,162];
+const TEXT=[35,35,35];
+
+function addPage(doc){
+    doc.addPage();
+    drawHeader(doc);
+    return TOP;
+}
+
+function drawHeader(doc){
+    doc.setTextColor(...NAVY);
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(13);
+    doc.text("JOURNAL OF ADVANCED MULTIDISCIPLINARY STUDIES",PAGE_W/2,11,{align:"center"});
+
+    doc.setFontSize(10);
+    doc.text("(JAMS)",PAGE_W/2,16,{align:"center"});
+
+    doc.setTextColor(...TEXT);
+    doc.setFontSize(9);
+    doc.text("Peer Review Evaluation Form",PAGE_W/2,21,{align:"center"});
+
+    doc.setTextColor(...BLUE);
+    doc.setFontSize(6.5);
+    doc.text("https://jamsjournal.org  |  info@jamsjournal.org",PAGE_W/2,26,{align:"center"});
+
+    doc.setDrawColor(...NAVY);
+    doc.setLineWidth(.35);
+    doc.line(LEFT,30,PAGE_W-RIGHT,30);
+
+    const page=doc.getNumberOfPages();
+    doc.setTextColor(100,100,100);
+    doc.setFont("helvetica","normal");
+    doc.setFontSize(6);
+    doc.text("Page "+page,PAGE_W-RIGHT,290,{align:"right"});
+}
+
+function section(doc,title,y){
+    const h=7;
+    if(y+h>BOTTOM) y=addPage(doc);
+
+    doc.setFillColor(...LIGHT);
+    doc.rect(LEFT,y,CONTENT_W,h,"F");
+
+    doc.setTextColor(...NAVY);
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(8.5);
+    doc.text(title,LEFT+3,y+5);
+
+    return y+h+4;
+}
+
+function manuscriptTable(doc,y){
+    const rows=[
+        ["Article ID",value("articleId")],
+        ["Paper Title",value("paperTitle")],
+        ["Authors Name",value("authorsName")],
+        ["Corresponding Author",value("correspondingAuthor")],
+        ["Submission Date",formatDate(value("submissionDate"))],
+        ["Review Date",formatDate(value("reviewDate"))]
+    ];
+
+    const labelW=42;
+    const valueW=CONTENT_W-labelW;
+
+    doc.setFont("helvetica","normal");
+    doc.setFontSize(8);
+
+    rows.forEach((row,i)=>{
+        const lines=doc.splitTextToSize(row[1]||"",valueW-6);
+        const h=Math.max(7,lines.length*3.8+3);
+
+        if(y+h>BOTTOM) y=addPage(doc);
+
+        if(i%2===0){
+            doc.setFillColor(248,249,250);
+            doc.rect(LEFT,y,CONTENT_W,h,"F");
+        }
+
+        doc.setDrawColor(...BORDER);
+        doc.rect(LEFT,y,CONTENT_W,h);
+        doc.line(LEFT+labelW,y,LEFT+labelW,y+h);
+
+        doc.setTextColor(...TEXT);
+        doc.setFont("helvetica","bold");
+        doc.setFontSize(7.5);
+        doc.text(row[0],LEFT+2,y+4.6);
+
+        doc.setFont("helvetica","normal");
+        doc.setFontSize(7.5);
+        doc.text(lines,LEFT+labelW+2,y+4.5);
+
+        y+=h;
+    });
+
+    return y+2;
+}
+
+function evaluationTable(doc,y){
+    const criteria=[
+        ["Originality","originality"],
+        ["Technical Quality","technical"],
+        ["Presentation & Organization","presentation"],
+        ["Language Quality","language"],
+        ["References","references"],
+        ["Practical Applicability","practical"],
+        ["Overall Quality","overall"]
+    ];
+
+    const ratings=["Outstanding","Excellent","Very Good","Good","Fair","Poor"];
+    const criterionW=51;
+    const ratingW=21.5;
+    const headerH=10;
+    const rowH=7;
+
+    const totalH=headerH+criteria.length*rowH;
+    if(y+totalH>BOTTOM) y=addPage(doc);
+
+    doc.setFillColor(241,243,245);
+    doc.rect(LEFT,y,CONTENT_W,headerH,"F");
+
+    doc.setDrawColor(...BORDER);
+    doc.rect(LEFT,y,CONTENT_W,totalH);
+    doc.line(LEFT+criterionW,y,LEFT+criterionW,y+totalH);
+
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(6.1);
+    doc.setTextColor(...TEXT);
+    doc.text("Criteria",LEFT+2,y+6);
+
+    ratings.forEach((r,i)=>{
+        const x=LEFT+criterionW+i*ratingW;
+        doc.line(x,y,x,y+totalH);
+        const lines=doc.splitTextToSize(r,ratingW-2);
+        doc.text(lines,x+ratingW/2,y+3.5,{align:"center"});
+    });
+
+    y+=headerH;
+
+    criteria.forEach(c=>{
+        doc.line(LEFT,y,LEFT+CONTENT_W,y);
+
+        doc.setFont("helvetica","normal");
+        doc.setFontSize(6.5);
+        doc.text(c[0],LEFT+2,y+4.7);
+
+        const selected=radioValue(c[1]);
+
+        ratings.forEach((r,i)=>{
+            if(selected===r){
+                const cx=LEFT+criterionW+i*ratingW+ratingW/2;
+                doc.setFillColor(...NAVY);
+                doc.circle(cx,y+rowH/2,1.7,"F");
+            }
+        });
+
+        y+=rowH;
+    });
+
+    return y+2;
+}
+
+function commentSection(doc,title,text,y){
+    const titleH=6;
+    const fontSize=9;
+    const lineH=4.0;
+    const padding=3;
+
+    if(y+titleH+8>BOTTOM) y=addPage(doc);
+
+    doc.setFillColor(...LIGHT);
+    doc.rect(LEFT,y,CONTENT_W,titleH,"F");
+
+    doc.setTextColor(...NAVY);
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(8);
+    doc.text(title,LEFT+3,y+4.2);
+
+    y+=titleH;
+
+    const paragraphs=(text||"").replace(/\r/g,"").split("\n");
+
+    doc.setFont("helvetica","normal");
+    doc.setFontSize(fontSize);
+    doc.setTextColor(...TEXT);
+
+    let hasContent=false;
+
+    paragraphs.forEach((paragraph,pIndex)=>{
+        const clean=paragraph.trim();
+
+        if(!clean){
+            if(hasContent){
+                y+=lineH;
+                if(y>BOTTOM) y=addPage(doc);
+            }
+            return;
+        }
+
+        const lines=doc.splitTextToSize(clean,CONTENT_W-padding*2);
+
+        lines.forEach(line=>{
+            if(y+lineH>BOTTOM){
+                y=addPage(doc);
+                doc.setFont("helvetica","normal");
+                doc.setFontSize(fontSize);
+                doc.setTextColor(...TEXT);
+            }
+
+            doc.text(line,LEFT+padding,y+3);
+            y+=lineH;
+            hasContent=true;
+        });
+
+        if(pIndex<paragraphs.length-1){
+            y+=1.5;
+        }
+    });
+
+    if(!hasContent){
+        if(y+12>BOTTOM) y=addPage(doc);
+        doc.setDrawColor(...BORDER);
+        doc.rect(LEFT,y,CONTENT_W,12);
+        y+=16;
+    }else{
+        y+=3;
+    }
+
+    return y;
+}
+
+function recommendation(doc,y){
+    y=section(doc,"Final Recommendation",y);
+
+    const recs=[
+        "Accept",
+        "Accept with Minor Revisions",
+        "Major Revisions Required",
+        "Resubmit after Revision",
+        "Reject"
+    ];
+
+    const selected=radioValue("recommendation");
+    const colW=90;
+    const rowH=8;
+
+    recs.forEach((r,i)=>{
+        const col=i<3?0:1;
+        const row=i<3?i:i-3;
+        const x=LEFT+col*colW;
+        const yy=y+row*rowH;
+
+        if(yy+rowH>BOTTOM) {
+            y=addPage(doc);
+        }
+
+        doc.setDrawColor(...BORDER);
+        doc.rect(x,yy,colW,rowH);
+
+        if(selected===r){
+            doc.setFillColor(...NAVY);
+            doc.circle(x+4,yy+4,1.7,"F");
+        }else{
+            doc.circle(x+4,yy+4,1.7);
+        }
+
+        doc.setTextColor(...TEXT);
+        doc.setFont("helvetica","normal");
+        doc.setFontSize(7);
+        doc.text(r,x+8,yy+4.8);
+    });
+
+    return y+3*rowH+4;
+}
+
+function declaration(doc,y){
+    const text="I confirm that this review represents my independent academic assessment of the manuscript and that I have no conflict of interest that would affect my recommendation.";
+    const title="Reviewer Declaration:";
+
+    const lines=doc.splitTextToSize(text,CONTENT_W-6);
+    const h=8+lines.length*3.6;
+
+    if(y+h>BOTTOM) y=addPage(doc);
+
+    doc.setFillColor(245,247,250);
+    doc.setDrawColor(190,200,210);
+    doc.rect(LEFT,y,CONTENT_W,h,"FD");
+
+    doc.setTextColor(...TEXT);
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(7.2);
+    doc.text(title,LEFT+3,y+4.5);
+
+    doc.setFont("helvetica","normal");
+    doc.setFontSize(7.2);
+    doc.text(lines,LEFT+3,y+8,{lineHeightFactor:1.25});
+
+    return y+h+3;
+}
+
+function generatePDF(){
+    const articleId=value("articleId");
+    const paperTitle=value("paperTitle");
+    const submissionDate=value("submissionDate");
+
+    if(!articleId){
+        alert("Please enter Article ID.");
+        document.getElementById("articleId").focus();
+        return;
+    }
+
+    if(!paperTitle){
+        alert("Please enter Paper Title.");
+        document.getElementById("paperTitle").focus();
+        return;
+    }
+
+    if(!submissionDate){
+        alert("Please enter Submission Date.");
+        document.getElementById("submissionDate").focus();
+        return;
+    }
+
+    const doc=new jsPDF({
+        orientation:"portrait",
+        unit:"mm",
+        format:"a4"
+    });
+
+    drawHeader(doc);
+    let y=TOP;
+
+    y=section(doc,"Manuscript Information",y);
+    y=manuscriptTable(doc,y);
+
+    y=section(doc,"Evaluation Criteria",y);
+    y=evaluationTable(doc,y);
+
+    y=section(doc,"Reviewer Comments",y);
+
+    y=commentSection(doc,"Strengths",value("strengths"),y);
+    y=commentSection(doc,"Weaknesses",value("weaknesses"),y);
+    y=commentSection(doc,"Suggestions for Improvement",value("suggestions"),y);
+
+    y=recommendation(doc,y);
+
+    y=section(doc,"Additional Confidential Comments to the Editor",y);
+    y=commentSection(doc,"Confidential Comments",value("confidential"),y);
+
+    y=declaration(doc,y);
+
+    let safeId=articleId.replace(/[^a-zA-Z0-9_-]/g,"_");
+    doc.save("RC_"+safeId+"_Peer_Review.pdf");
+}
+
+function clearForm(){
+    if(!confirm("Clear all form data?")) return;
+
+    document.querySelectorAll("input,textarea").forEach(el=>{
+        if(el.type==="radio") el.checked=false;
+        else el.value="";
+    });
+
+    document.getElementById("reviewDate").value=getToday();
+}
+</script>
+</body>
+</html>
