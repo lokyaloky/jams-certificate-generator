@@ -1,558 +1,1362 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JAMS Letter of Acceptance Generator</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <style>
-    @page {
-      size: A4;
-      margin: 0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    * {
-      box-sizing: border-box;
-    }
+    <title>JAMS Letter of Acceptance Generator</title>
 
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      background: #f1f3f5;
-    }
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    body {
-      font-family: Georgia, "Times New Roman", serif;
-      color: #222;
-      line-height: 1.65;
-    }
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
 
-    .generator {
-      max-width: 980px;
-      margin: 30px auto;
-      padding: 0 18px 32px;
-    }
+        * {
+            box-sizing: border-box;
+        }
 
-    .form-card {
-      background: #fff;
-      border-top: 5px solid #1d5f78;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, .10);
-      padding: 30px;
-      border-radius: 4px;
-    }
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f1f3f5;
+        }
 
-    .form-card h1 {
-      color: #1d5f78;
-      margin: 0 0 3px;
-      font-size: 27px;
-      line-height: 1.25;
-    }
+        body {
+            font-family: Georgia, "Times New Roman", serif;
+            color: #222;
+            line-height: 1.65;
+        }
 
-    .form-card>p {
-      margin: 0 0 24px;
-      color: #59636d;
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-    }
+        /* =========================
+           GENERATOR
+        ========================= */
 
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px 20px;
-    }
+        .generator {
+            max-width: 980px;
+            margin: 30px auto;
+            padding: 0 18px 32px;
+        }
 
-    .form-field {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
+        .form-card {
+            background: #fff;
+            border-top: 5px solid #1d5f78;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.10);
+            padding: 30px;
+            border-radius: 4px;
+        }
 
-    .form-field.full {
-      grid-column: 1 / -1;
-    }
+        .form-card h1 {
+            color: #1d5f78;
+            margin: 0 0 3px;
+            font-size: 27px;
+            line-height: 1.25;
+        }
 
-    label {
-      color: #263846;
-      font: 700 13px Arial, sans-serif;
-    }
+        .form-card > p {
+            margin: 0 0 24px;
+            color: #59636d;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
 
-    .required {
-      color: #a43a22;
-    }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px 20px;
+        }
 
-    input,
-    textarea {
-      width: 100%;
-      border: 1px solid #bac4cc;
-      border-radius: 3px;
-      padding: 10px 11px;
-      color: #222;
-      font: 15px Arial, sans-serif;
-      background: #fff;
-    }
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
 
-    textarea {
-      min-height: 72px;
-      resize: vertical;
-    }
+        .form-field.full {
+            grid-column: 1 / -1;
+        }
 
-    input:focus,
-    textarea:focus {
-      outline: 2px solid rgba(29, 95, 120, .2);
-      border-color: #1d5f78;
-    }
+        label {
+            color: #263846;
+            font: 700 13px Arial, sans-serif;
+        }
 
-    .form-actions,
-    .preview-actions {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px;
-      margin-top: 27px;
-    }
+        .required {
+            color: #a43a22;
+        }
 
-    button {
-      border: 0;
-      border-radius: 3px;
-      padding: 12px 22px;
-      cursor: pointer;
-      font: 700 14px Arial, sans-serif;
-    }
+        input,
+        textarea {
+            width: 100%;
+            border: 1px solid #bac4cc;
+            border-radius: 3px;
+            padding: 10px 11px;
+            color: #222;
+            font: 15px Arial, sans-serif;
+            background: #fff;
+        }
 
-    .primary {
-      color: #fff;
-      background: #1d5f78;
-    }
+        textarea {
+            min-height: 72px;
+            resize: vertical;
+        }
 
-    .primary:hover {
-      background: #16495e;
-    }
+        input:focus,
+        textarea:focus {
+            outline: 2px solid rgba(29, 95, 120, 0.2);
+            border-color: #1d5f78;
+        }
 
-    .secondary {
-      color: #1d5f78;
-      border: 1px solid #1d5f78;
-      background: #fff;
-    }
+        .form-actions,
+        .preview-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 27px;
+        }
 
-    .error {
-      display: none;
-      margin: 0 0 18px;
-      padding: 10px 12px;
-      border-left: 4px solid #a43a22;
-      color: #7d2818;
-      background: #fff1ef;
-      font: 14px Arial, sans-serif;
-    }
+        button {
+            border: 0;
+            border-radius: 3px;
+            padding: 12px 22px;
+            cursor: pointer;
+            font: 700 14px Arial, sans-serif;
+        }
 
-    .preview {
-      display: none;
-      padding: 18px 0 30px;
-    }
+        button:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
 
-    .page {
-      width: 210mm;
-      min-height: 297mm;
-      margin: 0 auto;
-      padding: 18mm 18mm 14mm;
-      background: #fff;
-      border: 2px solid #202020;
-      position: relative;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, .10);
-    }
+        .primary {
+            color: #fff;
+            background: #1d5f78;
+        }
 
-    .page::before {
-      content: "";
-      position: absolute;
-      inset: 4px;
-      border: 1px solid #555;
-      pointer-events: none;
-    }
+        .primary:hover {
+            background: #16495e;
+        }
 
-    .letter-header {
-      text-align: center;
-      position: relative;
-      z-index: 1;
-      padding-top: 5mm;
-    }
+        .secondary {
+            color: #1d5f78;
+            border: 1px solid #1d5f78;
+            background: #fff;
+        }
 
-    .logo-mark {
-      width: 58px;
-      height: 58px;
-      margin: 0 auto 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        .error {
+            display: none;
+            margin: 0 0 18px;
+            padding: 10px 12px;
+            border-left: 4px solid #a43a22;
+            color: #7d2818;
+            background: #fff1ef;
+            font: 14px Arial, sans-serif;
+        }
 
-    .logo-mark img {
-      width: 58px;
-      height: 58px;
-      object-fit: contain;
-    }
+        /* =========================
+           PREVIEW
+        ========================= */
 
-    .letter-header h1 {
-      margin: 0;
-      font-size: 21px;
-      line-height: 1.25;
-      letter-spacing: .2px;
-    }
+        .preview {
+            display: none;
+            padding: 18px 0 30px;
+        }
 
-    .journal-meta {
-      margin-top: 3px;
-      font: 600 12px Arial, sans-serif;
-    }
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 18mm 18mm 14mm;
+            background: #fff;
+            border: 2px solid #202020;
+            position: relative;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.10);
+        }
 
-    .date-row {
-      text-align: right;
-      margin-top: 22px;
-      font-size: 13px;
-      position: relative;
-      z-index: 1;
-    }
+        .page::before {
+            content: "";
+            position: absolute;
+            inset: 4px;
+            border: 1px solid #555;
+            pointer-events: none;
+        }
 
-    .document-title {
-      text-align: center;
-      text-decoration: underline;
-      font-size: 19px;
-      margin: 20px 0 24px;
-      position: relative;
-      z-index: 1;
-    }
+        .letter-header {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            padding-top: 5mm;
+        }
 
-    .content {
-      position: relative;
-      z-index: 1;
-      font-size: 13.5px;
-    }
+        .logo-mark {
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .content p {
-      margin: 0 0 17px;
-    }
+        .logo-mark img {
+            width: 58px;
+            height: 58px;
+            object-fit: contain;
+        }
 
-    .manuscript-box {
-      margin: 20px 0;
-      padding: 15px 18px;
-      background: #f7f8f9;
-      border-left: 4px solid #1d8a55;
-    }
+        .letter-header h1 {
+            margin: 0;
+            font-size: 21px;
+            line-height: 1.25;
+            letter-spacing: 0.2px;
+        }
 
-    .box-title {
-      font-weight: 700;
-      font-style: italic;
-      margin-bottom: 10px;
-      font-size: 14px;
-    }
+        .journal-meta {
+            margin-top: 3px;
+            font: 600 12px Arial, sans-serif;
+        }
 
-    .field {
-      display: grid;
-      grid-template-columns: 130px 1fr;
-      gap: 8px;
-      margin: 7px 0;
-    }
+        .date-row {
+            text-align: right;
+            margin-top: 22px;
+            font-size: 13px;
+            position: relative;
+            z-index: 1;
+        }
 
-    .label {
-      font-weight: 700;
-    }
+        .document-title {
+            text-align: center;
+            text-decoration: underline;
+            font-size: 19px;
+            margin: 20px 0 24px;
+            position: relative;
+            z-index: 1;
+        }
 
-    .manuscript-title {
-      font-style: italic;
-      font-weight: 600;
-    }
+        .content {
+            position: relative;
+            z-index: 1;
+            font-size: 13.5px;
+        }
 
-    #coAuthorsText {
-      white-space: pre-line;
-    }
+        .content p {
+            margin: 0 0 17px;
+        }
 
-    .publication-details {
-      margin-top: 20px !important;
-    }
+        .manuscript-box {
+            margin: 20px 0;
+            padding: 15px 18px;
+            background: #f7f8f9;
+            border-left: 4px solid #1d8a55;
+        }
 
-    .signature {
-      position: relative;
-      z-index: 1;
-      margin-top: 38px;
-      font-size: 13px;
-      line-height: 1.5;
-    }
+        .box-title {
+            font-weight: 700;
+            font-style: italic;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
 
-    .signature-line {
-      width: 150px;
-      height: 28px;
-      border-bottom: 1px solid #333;
-      margin-bottom: 7px;
-    }
+        .field {
+            display: grid;
+            grid-template-columns: 130px 1fr;
+            gap: 8px;
+            margin: 7px 0;
+        }
 
-    .letter-footer {
-      position: absolute;
-      left: 18mm;
-      right: 18mm;
-      bottom: 11mm;
-      text-align: center;
-      font: 9px Arial, sans-serif;
-      color: #555;
-      line-height: 1.5;
-      z-index: 1;
-    }
+        .label {
+            font-weight: 700;
+        }
 
-    @media screen and (max-width: 850px) {
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
+        .manuscript-title {
+            font-style: italic;
+            font-weight: 600;
+        }
 
-      .form-field.full {
-        grid-column: auto;
-      }
+        #coAuthorsText {
+            white-space: pre-line;
+        }
 
-      .generator {
-        margin-top: 16px;
-        padding: 0 10px 20px;
-      }
+        .publication-details {
+            margin-top: 20px !important;
+        }
 
-      .form-card {
-        padding: 22px 18px;
-      }
+        .signature {
+            position: relative;
+            z-index: 1;
+            margin-top: 38px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
 
-      .page {
-        width: calc(100% - 20px);
-        min-height: auto;
-        margin: 10px;
-        padding: 12mm 10mm 18mm;
-      }
+        .signature-image {
+            width: 140px;
+            height: auto;
+            display: block;
+            margin-bottom: 5px;
+            mix-blend-mode: multiply;
+        }
 
-      .field {
-        grid-template-columns: 1fr;
-        gap: 0;
-      }
+        .letter-footer {
+            position: absolute;
+            left: 18mm;
+            right: 18mm;
+            bottom: 11mm;
+            text-align: center;
+            font: 9px Arial, sans-serif;
+            color: #555;
+            line-height: 1.5;
+            z-index: 1;
+        }
 
-      .letter-footer {
-        left: 10mm;
-        right: 10mm;
-        bottom: 7mm;
-      }
-    }
+        /* =========================
+           MOBILE
+        ========================= */
 
-    .signature-image {
-      width: 140px;
-      height: auto;
-      display: block;
-      margin-bottom: 5px;
-      mix-blend-mode: screen;
-    }
+        @media screen and (max-width: 850px) {
 
-    @media print {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
 
-      html,
-      body {
-        background: #fff;
-      }
+            .form-field.full {
+                grid-column: auto;
+            }
 
-      .generator,
-      .preview-actions {
-        display: none !important;
-      }
+            .generator {
+                margin-top: 16px;
+                padding: 0 10px 20px;
+            }
 
-      .preview {
-        display: block !important;
-        padding: 0;
-      }
+            .form-card {
+                padding: 22px 18px;
+            }
 
-      .page {
-        margin: 0;
-        box-shadow: none;
-      }
-    }
-  </style>
+            .page {
+                width: calc(100% - 20px);
+                min-height: auto;
+                margin: 10px;
+                padding: 12mm 10mm 18mm;
+            }
+
+            .field {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .letter-footer {
+                left: 10mm;
+                right: 10mm;
+                bottom: 7mm;
+            }
+        }
+
+        /* =========================
+           PRINT
+        ========================= */
+
+        @media print {
+
+            html,
+            body {
+                background: #fff;
+            }
+
+            .generator,
+            .preview-actions {
+                display: none !important;
+            }
+
+            .preview {
+                display: block !important;
+                padding: 0;
+            }
+
+            .page {
+                margin: 0;
+                box-shadow: none;
+            }
+        }
+    </style>
 </head>
 
 <body>
-  <section class="generator" id="generator">
-    <div class="form-card">
-      <h1>JAMS Letter of Acceptance</h1>
-      <p>Enter manuscript information to prepare a print-ready acceptance letter.</p>
-      <div id="validation" class="error" role="alert"></div>
-      <form id="detailsForm" novalidate>
-        <div class="form-grid">
-          <div class="form-field"><label for="manuscriptId">Manuscript ID <span class="required">*</span></label><input
-              id="manuscriptId" required></div>
-          <div class="form-field"><label for="authorName">Author Name <span class="required">*</span></label><input
-              id="authorName" required></div>
-          <div class="form-field full"><label for="coAuthors">Co-Author(s)</label><textarea id="coAuthors"
-              placeholder="Enter co-author names, one per line or separated by commas"></textarea></div>
-          <div class="form-field full"><label for="title">Article / Manuscript Title <span
-                class="required">*</span></label><textarea id="title" required></textarea></div>
-          <div class="form-field"><label for="affiliation">Affiliation / Institution</label><input id="affiliation">
-          </div>
-          <div class="form-field"><label for="country">Country</label><input id="country"></div>
-          <div class="form-field"><label for="department">Department <small>(optional)</small></label><input
-              id="department"></div>
-          <div class="form-field"><label for="email">Email Address</label><input id="email" type="email"></div>
-          <div class="form-field"><label for="volume">Journal Volume</label><input id="volume" placeholder="e.g., 1">
-          </div>
-          <div class="form-field"><label for="issue">Issue Number</label><input id="issue" placeholder="e.g., 1"></div>
-          <div class="form-field full"><label for="pagesArticleNumber">Pages / Article Number</label><input
-              id="pagesArticleNumber" placeholder="e.g., pp. 25–38 or Article 1024"></div>
-          <div class="form-field"><label for="month">Publication Month</label><input id="month"
-              placeholder="e.g., August"></div>
-          <div class="form-field"><label for="year">Publication Year</label><input id="year" type="number"
-              placeholder="e.g., 2026"></div>
-          <div class="form-field"><label for="acceptanceDate">Acceptance Date</label><input id="acceptanceDate"
-              type="date"></div>
-          <div class="form-field"><label for="publicationDate">Publication Date <small>(optional)</small></label><input
-              id="publicationDate" type="date"></div>
-          <div class="form-field"><label for="doi">DOI <small>(optional)</small></label><input id="doi"></div>
-          <div class="form-field"><label for="editor">Editor / Editorial Office Name</label><input id="editor"
-              placeholder="Editor / Editorial Office"></div>
+
+    <!-- =========================
+         GENERATOR FORM
+    ========================= -->
+
+    <section class="generator" id="generator">
+
+        <div class="form-card">
+
+            <h1>JAMS Letter of Acceptance</h1>
+
+            <p>
+                Enter manuscript information to prepare a print-ready acceptance letter.
+            </p>
+
+            <div id="validation" class="error" role="alert"></div>
+
+            <form id="detailsForm" novalidate>
+
+                <div class="form-grid">
+
+                    <!-- Manuscript ID -->
+                    <div class="form-field">
+                        <label for="manuscriptId">
+                            Manuscript ID <span class="required">*</span>
+                        </label>
+
+                        <input
+                            id="manuscriptId"
+                            type="text"
+                            required
+                        >
+                    </div>
+
+                    <!-- Author -->
+                    <div class="form-field">
+                        <label for="authorName">
+                            Author Name <span class="required">*</span>
+                        </label>
+
+                        <input
+                            id="authorName"
+                            type="text"
+                            required
+                        >
+                    </div>
+
+                    <!-- Co Authors -->
+                    <div class="form-field full">
+                        <label for="coAuthors">
+                            Co-Author(s)
+                        </label>
+
+                        <textarea
+                            id="coAuthors"
+                            placeholder="Enter co-author names, one per line or separated by commas"
+                        ></textarea>
+                    </div>
+
+                    <!-- Article Title -->
+                    <div class="form-field full">
+                        <label for="title">
+                            Article / Manuscript Title
+                            <span class="required">*</span>
+                        </label>
+
+                        <textarea
+                            id="title"
+                            required
+                        ></textarea>
+                    </div>
+
+                    <!-- Affiliation -->
+                    <div class="form-field">
+                        <label for="affiliation">
+                            Affiliation / Institution
+                        </label>
+
+                        <input
+                            id="affiliation"
+                            type="text"
+                        >
+                    </div>
+
+                    <!-- Country -->
+                    <div class="form-field">
+                        <label for="country">
+                            Country
+                        </label>
+
+                        <input
+                            id="country"
+                            type="text"
+                        >
+                    </div>
+
+                    <!-- Department -->
+                    <div class="form-field">
+                        <label for="department">
+                            Department <small>(optional)</small>
+                        </label>
+
+                        <input
+                            id="department"
+                            type="text"
+                        >
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-field">
+                        <label for="email">
+                            Email Address
+                        </label>
+
+                        <input
+                            id="email"
+                            type="email"
+                        >
+                    </div>
+
+                    <!-- Volume -->
+                    <div class="form-field">
+                        <label for="volume">
+                            Journal Volume
+                        </label>
+
+                        <input
+                            id="volume"
+                            type="text"
+                            placeholder="e.g., 1"
+                        >
+                    </div>
+
+                    <!-- Issue -->
+                    <div class="form-field">
+                        <label for="issue">
+                            Issue Number
+                        </label>
+
+                        <input
+                            id="issue"
+                            type="text"
+                            placeholder="e.g., 1"
+                        >
+                    </div>
+
+                    <!-- Pages -->
+                    <div class="form-field full">
+                        <label for="pagesArticleNumber">
+                            Pages / Article Number
+                        </label>
+
+                        <input
+                            id="pagesArticleNumber"
+                            type="text"
+                            placeholder="e.g., pp. 25–38 or Article 1024"
+                        >
+                    </div>
+
+                    <!-- Month -->
+                    <div class="form-field">
+                        <label for="month">
+                            Publication Month
+                        </label>
+
+                        <input
+                            id="month"
+                            type="text"
+                            placeholder="e.g., August"
+                        >
+                    </div>
+
+                    <!-- Year -->
+                    <div class="form-field">
+                        <label for="year">
+                            Publication Year
+                        </label>
+
+                        <input
+                            id="year"
+                            type="number"
+                            placeholder="e.g., 2026"
+                        >
+                    </div>
+
+                    <!-- Acceptance Date -->
+                    <div class="form-field">
+                        <label for="acceptanceDate">
+                            Acceptance Date
+                        </label>
+
+                        <input
+                            id="acceptanceDate"
+                            type="date"
+                        >
+                    </div>
+
+                    <!-- Publication Date -->
+                    <div class="form-field">
+                        <label for="publicationDate">
+                            Publication Date <small>(optional)</small>
+                        </label>
+
+                        <input
+                            id="publicationDate"
+                            type="date"
+                        >
+                    </div>
+
+                    <!-- DOI -->
+                    <div class="form-field">
+                        <label for="doi">
+                            DOI <small>(optional)</small>
+                        </label>
+
+                        <input
+                            id="doi"
+                            type="text"
+                        >
+                    </div>
+
+                    <!-- Editor -->
+                    <div class="form-field">
+                        <label for="editor">
+                            Editor / Editorial Office Name
+                        </label>
+
+                        <input
+                            id="editor"
+                            type="text"
+                            placeholder="Editor / Editorial Office"
+                        >
+                    </div>
+
+                </div>
+
+                <div class="form-actions">
+
+                    <button
+                        class="primary"
+                        type="submit"
+                    >
+                        Generate Letter
+                    </button>
+
+                </div>
+
+            </form>
+
         </div>
-        <div class="form-actions"><button class="primary" type="submit">Generate Letter</button></div>
-      </form>
-    </div>
-  </section>
-  <section class="preview" id="preview">
-    <main class="page" id="letter">
-      <header class="letter-header">
-        <div class="logo-mark" aria-label="JAMS logo"><img id="logo"
-            src="https://jamsjournal.org/public/journals/1/pageHeaderLogoImage_en.png" alt="JAMS logo"></div>
-        <h1>Journal of Advanced Multidisciplinary Studies (JAMS)</h1>
-        <div class="journal-meta">JAMS | ISSN: [eISSN / ISSN]</div>
-      </header>
-      <div class="date-row"><strong>Date:</strong> <span id="publicationDateText"></span></div>
-      <h2 class="document-title">Letter of Acceptance</h2>
-      <section class="content">
-        <p><strong>To:</strong></p>
-        <p>Dear <strong id="authorNameText"></strong>,</p>
-        <p>We are pleased to inform you that your manuscript has been reviewed and <strong>accepted for
-            publication</strong> in the <strong>Journal of Advanced Multidisciplinary Studies (JAMS)</strong>.</p>
-        <div class="manuscript-box">
-          <div class="box-title">Manuscript Details</div>
-          <div class="field"><span class="label">Manuscript ID:</span><span id="manuscriptIdText"></span></div>
-          <div class="field"><span class="label">Author:</span><span id="authorDetailsText"></span></div>
-          <div class="field title-field"><span class="label">Manuscript Title:</span><span class="manuscript-title"
-              id="titleText"></span></div>
-          <div class="field" id="coAuthorsRow" style="display:none;">
-            <span class="label">Co-Author(s):</span><span id="coAuthorsText"></span>
-          </div>
-          <div class="field" id="affiliationRow" style="display:none;">
-            <span class="label">Affiliation:</span><span id="affiliationText"></span>
-          </div>
-          <div class="field" id="doiRow" style="display:none;">
-            <span class="label">DOI:</span><a id="doiText" href="#" target="_blank" rel="noopener"
-              style="color:#1d5f78;text-decoration:none;word-break:break-all;"></a>
-          </div>
+
+    </section>
+
+
+    <!-- =========================
+         LETTER PREVIEW
+    ========================= -->
+
+    <section class="preview" id="preview">
+
+        <main class="page" id="letter">
+
+            <!-- Header -->
+            <header class="letter-header">
+
+                <div
+                    class="logo-mark"
+                    aria-label="JAMS logo"
+                >
+
+                    <img
+                        id="logo"
+                        src="./JAMS-Logo.png"
+                        alt="JAMS logo"
+                    >
+
+                </div>
+
+                <h1>
+                    Journal of Advanced Multidisciplinary Studies (JAMS)
+                </h1>
+
+                <div class="journal-meta">
+                    JAMS | ISSN: [eISSN / ISSN]
+                </div>
+
+            </header>
+
+
+            <!-- Date -->
+            <div class="date-row">
+
+                <strong>Date:</strong>
+
+                <span id="publicationDateText"></span>
+
+            </div>
+
+
+            <!-- Document Title -->
+            <h2 class="document-title">
+                Letter of Acceptance
+            </h2>
+
+
+            <!-- Content -->
+            <section class="content">
+
+                <p>
+                    <strong>To:</strong>
+                </p>
+
+                <p>
+                    Dear
+                    <strong id="authorNameText"></strong>,
+                </p>
+
+                <p>
+                    We are pleased to inform you that your manuscript has been reviewed and
+                    <strong>accepted for publication</strong>
+                    in the
+                    <strong>
+                        Journal of Advanced Multidisciplinary Studies (JAMS)
+                    </strong>.
+                </p>
+
+
+                <!-- Manuscript Details -->
+                <div class="manuscript-box">
+
+                    <div class="box-title">
+                        Manuscript Details
+                    </div>
+
+
+                    <div class="field">
+
+                        <span class="label">
+                            Manuscript ID:
+                        </span>
+
+                        <span id="manuscriptIdText"></span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <span class="label">
+                            Author:
+                        </span>
+
+                        <span id="authorDetailsText"></span>
+
+                    </div>
+
+
+                    <div class="field title-field">
+
+                        <span class="label">
+                            Manuscript Title:
+                        </span>
+
+                        <span
+                            class="manuscript-title"
+                            id="titleText"
+                        ></span>
+
+                    </div>
+
+
+                    <!-- Co Authors -->
+                    <div
+                        class="field"
+                        id="coAuthorsRow"
+                        style="display: none;"
+                    >
+
+                        <span class="label">
+                            Co-Author(s):
+                        </span>
+
+                        <span id="coAuthorsText"></span>
+
+                    </div>
+
+
+                    <!-- Affiliation -->
+                    <div
+                        class="field"
+                        id="affiliationRow"
+                        style="display: none;"
+                    >
+
+                        <span class="label">
+                            Affiliation:
+                        </span>
+
+                        <span id="affiliationText"></span>
+
+                    </div>
+
+
+                    <!-- DOI -->
+                    <div
+                        class="field"
+                        id="doiRow"
+                        style="display: none;"
+                    >
+
+                        <span class="label">
+                            DOI:
+                        </span>
+
+                        <a
+                            id="doiText"
+                            href="#"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style="
+                                color: #1d5f78;
+                                text-decoration: none;
+                                word-break: break-all;
+                            "
+                        ></a>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Publication Details -->
+                <p class="publication-details">
+
+                    <strong>
+                        Publication Details:
+                    </strong>
+
+                    Volume
+                    <span id="volumeText"></span>,
+
+                    Issue
+                    <span id="issueText"></span>,
+
+                    <span id="articleNumberText">
+                        [PAGES / ARTICLE NUMBER]
+                    </span>.
+
+                </p>
+
+
+                <p>
+                    We congratulate you on the acceptance of your research and look forward
+                    to publishing your work in the Journal of Advanced Multidisciplinary Studies.
+                </p>
+
+
+                <p>
+                    Please retain this letter for your academic and institutional records.
+                </p>
+
+            </section>
+
+
+            <!-- Signature -->
+            <section class="signature">
+
+                <img
+                    src="./bhadrapasign.png"
+                    alt="Authorized Signature"
+                    class="signature-image"
+                >
+
+                <strong id="editorText">
+                    Editor / Editorial Office
+                </strong>
+
+                <div>
+                    Journal of Advanced Multidisciplinary Studies (JAMS)
+                </div>
+
+                <div>
+                    Website: jamsjournal.org
+                </div>
+
+                <div>
+                    Email: info@jamsjournal.org
+                </div>
+
+            </section>
+
+
+            <!-- Footer -->
+            <footer class="letter-footer">
+
+                <div>
+                    Journal of Advanced Multidisciplinary Studies (JAMS)
+                </div>
+
+                <div>
+
+                    Volume
+                    <span id="footerVolume">1</span>,
+
+                    Issue
+                    <span id="footerIssue">1</span>
+
+                    |
+
+                    <span id="footerMonth">
+                        August
+                    </span>
+
+                    <span id="footerYear">
+                        2026
+                    </span>
+
+                </div>
+
+            </footer>
+
+        </main>
+
+
+        <!-- Preview Buttons -->
+        <div class="preview-actions">
+
+            <button
+                class="secondary"
+                type="button"
+                id="edit"
+            >
+                Edit Details
+            </button>
+
+            <button
+                class="primary"
+                type="button"
+                id="download"
+            >
+                Download Letter
+            </button>
+
         </div>
-        <p class="publication-details"><strong>Publication Details:</strong> Volume <span id="volumeText"></span>, Issue
-          <span id="issueText"></span>, <span id="articleNumberText">[PAGES / ARTICLE NUMBER]</span>.
-        </p>
-        <p>We congratulate you on the acceptance of your research and look forward to publishing your work in the
-          Journal of Advanced Multidisciplinary Studies.</p>
-        <p>Please retain this letter for your academic and institutional records.</p>
-      </section>
-      <!-- <section class="signature">
-        <div class="signature-line"></div><strong id="editorText">Editor / Editorial Office</strong>
-        <div>Journal of Advanced Multidisciplinary Studies (JAMS)</div>
-        <div>Website: jamsjournal.org</div>
-        <div>Email: info@jamsjournal.org</div>
-      </section> -->
-      <section class="signature">
-        <img src="./bhadrapasign.png" alt="Authorized Signature" class="signature-image">
-        <strong id="editorText">Editor / Editorial Office</strong>
-        <div>Journal of Advanced Multidisciplinary Studies (JAMS)</div>
-        <div>Website: jamsjournal.org</div>
-        <div>Email: info@jamsjournal.org</div>
-      </section>
-      <footer class="letter-footer">
-        <div>Journal of Advanced Multidisciplinary Studies (JAMS)</div>
-        <div>Volume <span id="footerVolume">1</span>, Issue <span id="footerIssue">1</span> | <span
-            id="footerMonth">August</span> <span id="footerYear">2026</span></div>
-      </footer>
-    </main>
-    <div class="preview-actions"><button class="secondary" type="button" id="edit">Edit Details</button><button
-        class="primary" type="button" id="download">Download Letter</button></div>
-  </section>
 
-  <script>
-    const $ = id => document.getElementById(id);
-    const fields = ['manuscriptId', 'authorName', 'coAuthors', 'title', 'volume', 'issue', 'month', 'year', 'acceptanceDate', 'publicationDate', 'doi', 'editor'];
-    const value = id => $(id).value.trim();
-    const display = (id, text) => { $(id).textContent = text; };
-    const formatDate = date => { if (!date) return ''; const [y, m, d] = date.split('-'); return new Date(+y, +m - 1, +d).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }); };
-    function populate() {
-      display('authorNameText', value('authorName'));
-      display('authorDetailsText', value('authorName'));
-      display('manuscriptIdText', value('manuscriptId'));
-      display('titleText', value('title'));
+    </section>
 
-      const affiliation = value('affiliation');
-      display('affiliationText', affiliation);
-      $('affiliationRow').style.display = affiliation ? 'grid' : 'none';
 
-      const coAuthors = value('coAuthors').replace(/\s*[,;]\s*/g, '\n').trim();
-      display('coAuthorsText', coAuthors);
-      $('coAuthorsRow').style.display = coAuthors ? 'grid' : 'none';
+    <!-- =========================
+         JAVASCRIPT
+    ========================= -->
 
-      const doi = value('doi');
-      const doiText = $('doiText');
-      if (doi) {
-        const doiUrl = doi.toLowerCase().startsWith('http') ? doi : 'https://doi.org/' + doi.replace(/^doi:\s*/i, '');
-        doiText.textContent = doi.replace(/^https?:\/\/(doi\.org\/)?/i, '').replace(/^doi:\s*/i, '');
-        doiText.href = doiUrl;
-        $('doiRow').style.display = 'grid';
-      } else {
-        doiText.textContent = '';
-        doiText.removeAttribute('href');
-        $('doiRow').style.display = 'none';
-      }
+    <script>
 
-      display('volumeText', value('volume') || '[VOLUME]'); display('issueText', value('issue') || '[ISSUE]'); display('articleNumberText', value('pagesArticleNumber') || '[PAGES / ARTICLE NUMBER]');
-      display('publicationDateText', formatDate(value('acceptanceDate')) || formatDate(value('publicationDate')) || '[ACCEPTANCE DATE]');
-      display('editorText', value('editor') || 'Editor / Editorial Office'); display('footerVolume', value('volume') || '1'); display('footerIssue', value('issue') || '1'); display('footerMonth', value('month') || 'August'); display('footerYear', value('year') || '2026');
-    }
-    $('detailsForm').addEventListener('submit', event => { event.preventDefault(); const missing = [['manuscriptId', 'Manuscript ID'], ['authorName', 'Author Name'], ['title', 'Article / Manuscript Title']].filter(([id]) => !value(id)).map(([, name]) => name); if (missing.length) { $('validation').textContent = 'Please complete: ' + missing.join(', ') + '.'; $('validation').style.display = 'block'; return; } $('validation').style.display = 'none'; populate(); $('generator').style.display = 'none'; $('preview').style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); });
-    $('edit').addEventListener('click', () => { $('preview').style.display = 'none'; $('generator').style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); });
-    $('download').addEventListener('click', async () => {
-      const btn = $('download');
-      btn.disabled = true;
-      btn.textContent = 'Preparing PDF…';
-      try {
-        if (!window.html2canvas || !window.jspdf) throw new Error('PDF library unavailable');
+        "use strict";
 
-        // Re-populate immediately before capture so Co-Authors and all optional fields
-        // are guaranteed to be present in the PDF.
-        populate();
+        /* =========================
+           HELPER FUNCTIONS
+        ========================= */
 
-        // Give the browser a moment to finish rendering the updated content.
-        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        const $ = (id) => document.getElementById(id);
 
-        const canvas = await html2canvas($('letter'), {
-          scale: 2,
-          useCORS: true,
-          allowTaint: false,
-          backgroundColor: '#ffffff',
-          logging: false
-        });
+        const value = (id) => {
+            const element = $(id);
 
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({
-          orientation: 'portrait',
-          unit: 'mm',
-          format: 'a4',
-          compress: true
-        });
+            if (!element) {
+                return "";
+            }
 
-        const imageData = canvas.toDataURL('image/jpeg', 0.58);
-        pdf.addImage(imageData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
-      } catch (err) {
-        console.error(err);
-        alert('PDF download could not load. Your print dialog will open; choose “Save as PDF”.');
-        window.print();
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Download Letter';
-      }
-    });
-  </script>
+            return element.value.trim();
+        };
+
+        const display = (id, text) => {
+            const element = $(id);
+
+            if (element) {
+                element.textContent = text;
+            }
+        };
+
+
+        /* =========================
+           DATE FORMATTER
+        ========================= */
+
+        function formatDate(date) {
+
+            if (!date) {
+                return "";
+            }
+
+            const parts = date.split("-");
+
+            if (parts.length !== 3) {
+                return "";
+            }
+
+            const year = Number(parts[0]);
+            const month = Number(parts[1]);
+            const day = Number(parts[2]);
+
+            const parsedDate = new Date(
+                year,
+                month - 1,
+                day
+            );
+
+            if (Number.isNaN(parsedDate.getTime())) {
+                return "";
+            }
+
+            return parsedDate.toLocaleDateString(
+                "en-GB",
+                {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric"
+                }
+            );
+        }
+
+
+        /* =========================
+           POPULATE LETTER
+        ========================= */
+
+        function populate() {
+
+            /* Author */
+            display(
+                "authorNameText",
+                value("authorName")
+            );
+
+            display(
+                "authorDetailsText",
+                value("authorName")
+            );
+
+
+            /* Manuscript */
+            display(
+                "manuscriptIdText",
+                value("manuscriptId")
+            );
+
+            display(
+                "titleText",
+                value("title")
+            );
+
+
+            /* Affiliation */
+            const affiliation = value("affiliation");
+
+            display(
+                "affiliationText",
+                affiliation
+            );
+
+            $("affiliationRow").style.display =
+                affiliation ? "grid" : "none";
+
+
+            /* Co Authors */
+            const coAuthors = value("coAuthors")
+                .replace(/[,;]+/g, "\n")
+                .trim();
+
+            display(
+                "coAuthorsText",
+                coAuthors
+            );
+
+            $("coAuthorsRow").style.display =
+                coAuthors ? "grid" : "none";
+
+
+            /* DOI */
+            const doi = value("doi");
+
+            const doiText = $("doiText");
+
+            if (doi) {
+
+                let cleanDoi = doi
+                    .replace(/^https?:\/\/doi\.org\//i, "")
+                    .replace(/^doi:\s*/i, "")
+                    .trim();
+
+                const doiUrl =
+                    /^https?:\/\//i.test(doi)
+                        ? doi
+                        : "https://doi.org/" + cleanDoi;
+
+                doiText.textContent = cleanDoi;
+                doiText.href = doiUrl;
+
+                $("doiRow").style.display = "grid";
+
+            } else {
+
+                doiText.textContent = "";
+                doiText.removeAttribute("href");
+
+                $("doiRow").style.display = "none";
+            }
+
+
+            /* Publication Details */
+            display(
+                "volumeText",
+                value("volume") || "[VOLUME]"
+            );
+
+            display(
+                "issueText",
+                value("issue") || "[ISSUE]"
+            );
+
+            display(
+                "articleNumberText",
+                value("pagesArticleNumber") ||
+                "[PAGES / ARTICLE NUMBER]"
+            );
+
+
+            /* Letter Date */
+            const acceptanceDate = formatDate(
+                value("acceptanceDate")
+            );
+
+            const publicationDate = formatDate(
+                value("publicationDate")
+            );
+
+            display(
+                "publicationDateText",
+                acceptanceDate ||
+                publicationDate ||
+                "[ACCEPTANCE DATE]"
+            );
+
+
+            /* Editor */
+            display(
+                "editorText",
+                value("editor") ||
+                "Editor / Editorial Office"
+            );
+
+
+            /* Footer */
+            display(
+                "footerVolume",
+                value("volume") || "1"
+            );
+
+            display(
+                "footerIssue",
+                value("issue") || "1"
+            );
+
+            display(
+                "footerMonth",
+                value("month") || "August"
+            );
+
+            display(
+                "footerYear",
+                value("year") || "2026"
+            );
+        }
+
+
+        /* =========================
+           FORM SUBMIT
+        ========================= */
+
+        $("detailsForm").addEventListener(
+            "submit",
+            function (event) {
+
+                event.preventDefault();
+
+                const requiredFields = [
+                    ["manuscriptId", "Manuscript ID"],
+                    ["authorName", "Author Name"],
+                    ["title", "Article / Manuscript Title"]
+                ];
+
+                const missing = requiredFields
+                    .filter(([id]) => !value(id))
+                    .map(([, name]) => name);
+
+
+                if (missing.length > 0) {
+
+                    $("validation").textContent =
+                        "Please complete: " +
+                        missing.join(", ") +
+                        ".";
+
+                    $("validation").style.display = "block";
+
+                    return;
+                }
+
+
+                $("validation").style.display = "none";
+
+                populate();
+
+                $("generator").style.display = "none";
+                $("preview").style.display = "block";
+
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+            }
+        );
+
+
+        /* =========================
+           EDIT BUTTON
+        ========================= */
+
+        $("edit").addEventListener(
+            "click",
+            function () {
+
+                $("preview").style.display = "none";
+                $("generator").style.display = "block";
+
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+            }
+        );
+
+
+        /* =========================
+           DOWNLOAD PDF
+        ========================= */
+
+        $("download").addEventListener(
+            "click",
+            async function () {
+
+                const btn = $("download");
+
+                btn.disabled = true;
+                btn.textContent = "Preparing PDF...";
+
+
+                try {
+
+                    /* Check libraries */
+                    if (
+                        typeof window.html2canvas === "undefined" ||
+                        typeof window.jspdf === "undefined"
+                    ) {
+                        throw new Error(
+                            "PDF library unavailable."
+                        );
+                    }
+
+
+                    /* Update letter */
+                    populate();
+
+
+                    /* Wait for rendering */
+                    await new Promise((resolve) => {
+
+                        requestAnimationFrame(() => {
+
+                            requestAnimationFrame(resolve);
+
+                        });
+
+                    });
+
+
+                    /* Capture letter */
+                    const canvas = await html2canvas(
+                        $("letter"),
+                        {
+                            scale: 1.25,
+                            useCORS: true,
+                            allowTaint: false,
+                            backgroundColor: "#ffffff",
+                            logging: false
+                        }
+                    );
+
+
+                    /* Create PDF */
+                    const { jsPDF } = window.jspdf;
+
+                    const pdf = new jsPDF({
+                        orientation: "portrait",
+                        unit: "mm",
+                        format: "a4",
+                        compress: true
+                    });
+
+
+                    /* Convert canvas to image */
+                    const imageData =
+                        canvas.toDataURL(
+                            "image/jpeg",
+                            0.85
+                        );
+
+
+                    /* Add image */
+                    pdf.addImage(
+                        imageData,
+                        "JPEG",
+                        0,
+                        0,
+                        210,
+                        297,
+                        undefined,
+                        "FAST"
+                    );
+
+
+                    /* File name */
+                    const manuscriptId =
+                        value("manuscriptId") || "JAMS";
+
+                    const fileName =
+                        manuscriptId +
+                        "_Acceptance_Letter.pdf";
+
+
+                    /* Save */
+                    pdf.save(fileName);
+
+                } catch (error) {
+
+                    console.error(
+                        "PDF generation error:",
+                        error
+                    );
+
+                    alert(
+                        "PDF download could not be generated. " +
+                        "The print dialog will open. " +
+                        "Please choose 'Save as PDF'."
+                    );
+
+                    window.print();
+
+                } finally {
+
+                    btn.disabled = false;
+                    btn.textContent = "Download Letter";
+                }
+            }
+        );
+
+    </script>
+
 </body>
 
 </html>
+```
