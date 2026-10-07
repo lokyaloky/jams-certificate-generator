@@ -642,7 +642,8 @@
               <small>(optional)</small></label><textarea id="contribution"
               placeholder="Optional custom recognition statement"></textarea></div>
         </div>
-        <div class="actions"><button class="button-primary" type="submit">Generate Certificate</button><button class="button-gold" type="button" id="verifyLink">Create Verification Link</button></div>
+        <div class="actions"><button class="button-primary" type="submit">Generate Certificate</button><button
+            class="button-gold" type="button" id="verifyLink">Create Verification Link</button></div>
       </form>
     </aside>
     <section class="preview-panel">
@@ -655,7 +656,8 @@
           <div class="top-rule"></div>
           <div class="bottom-rule"></div>
           <div class="watermark">JAMS</div>
-          <header class="certificate-header"><img class="logo" src="https://jamsjournal.org/public/journals/1/pageHeaderLogoImage_en.png" alt="JAMS logo">
+          <header class="certificate-header"><img class="logo"
+              src="https://jamsjournal.org/public/journals/1/pageHeaderLogoImage_en.png" alt="JAMS logo">
             <div>
               <h1 class="journal-name">Journal of Advanced Multidisciplinary Studies</h1>
               <p class="journal-tagline">JAMS - A Multidisciplinary Scholarly Journal</p>
@@ -769,13 +771,37 @@
         publicationMonth: v('publicationMonth'), volume: v('volume'), issue: v('issue')
       };
       const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))))
-        .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
       const url = new URL('verify.html', window.location.href);
       url.searchParams.set('data', encoded);
-      await navigator.clipboard?.writeText(url.href).catch(()=>{});
+      await navigator.clipboard?.writeText(url.href).catch(() => { });
       alert('Verification link created:\n\n' + url.href + '\n\nThe link has been copied if your browser allows it.');
     });
-    $('download').addEventListener('click', async () => { if (!verify()) return; await populate(); const btn = $('download'); btn.disabled = true; btn.textContent = 'Preparing PDF...'; try { if (!window.html2canvas || !window.jspdf) throw Error('libraries unavailable'); const canvas = await html2canvas($('certificate'), { scale: 0.85, useCORS: true, backgroundColor: '#fffdf8', logging: false }); const { jsPDF } = window.jspdf; const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true }); const imageData = canvas.toDataURL('image/jpeg', 0.48); pdf.addImage(imageData, 'JPEG', 0, 0, 297, 210, undefined, 'FAST'); pdf.save('JAMS_Certificate_' + safeName(v('certificateId')) + '_' + safeName(v('recipient')) + '.pdf'); } catch (err) { alert('PDF library could not load. The print dialog will open; please choose Save as PDF.'); window.print(); } finally { btn.disabled = false; btn.textContent = 'Download PDF'; } });
+    $('download').addEventListener('click', async () => {
+      if (!verify()) return; await populate();
+      const btn = $('download'); btn.disabled = true; btn.textContent = 'Preparing PDF...';
+      try {
+        if (!window.html2canvas || !window.jspdf)
+          throw Error('libraries unavailable');
+        // const canvas = await html2canvas($('certificate'), { scale: 0.85, useCORS: true, backgroundColor: '#fffdf8', logging: false }); 
+        const canvas = await html2canvas($('certificate'), {
+          scale: 1.5,
+          useCORS: true,
+          allowTaint: false,
+          backgroundColor: '#fffdf8',
+          logging: false
+        });
+        const { jsPDF } = window.jspdf; const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
+        const imageData = canvas.toDataURL('image/jpeg', 0.72);
+        pdf.addImage(imageData, 'JPEG', 0, 0, 297, 210, undefined, 'FAST');
+        pdf.save('JAMS_Certificate_' + safeName(v('certificateId')) + '_' + safeName(v('recipient')) + '.pdf');
+      }
+      catch (err) {
+        alert('PDF library could not load. The print dialog will open; please choose Save as PDF.');
+        window.print();
+      }
+      finally { btn.disabled = false; btn.textContent = 'Download PDF'; }
+    });
     $('issuedDate').valueAsDate = new Date();
     $('publicationYear').value = new Date().getFullYear();
     $('publicationMonth').value = new Date().toLocaleString('en-US', { month: 'long' });
