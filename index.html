@@ -788,7 +788,76 @@
     // pdf.save('JAMS_Certificate_' + safeName(v('certificateId')) + '_' + safeName(v('recipient')) + '.pdf'); } 
     // catch (err) { alert('PDF library could not load. The print dialog will open; please choose Save as PDF.'); window.print(); } 
     // finally { btn.disabled = false; btn.textContent = 'Download PDF'; } });
+    // $('download').addEventListener('click', async () => {
+    //   if (!verify()) return;
+
+    //   await populate();
+
+    //   const btn = $('download');
+    //   btn.disabled = true;
+    //   btn.textContent = 'Preparing High Quality PDF...';
+
+    //   try {
+    //     if (!window.html2canvas || !window.jspdf) {
+    //       throw Error('libraries unavailable');
+    //     }
+
+    //     // High-resolution certificate rendering
+    //     const canvas = await html2canvas($('certificate'), {
+    //       scale: 2,
+    //       useCORS: true,
+    //       allowTaint: false,
+    //       backgroundColor: '#fffdf8',
+    //       logging: false,
+    //       imageTimeout: 15000
+    //     });
+
+    //     const imageData = canvas.toDataURL('image/jpeg', 0.82);
+
+    //     const { jsPDF } = window.jspdf;
+
+    //     const pdf = new jsPDF({
+    //       orientation: 'landscape',
+    //       unit: 'mm',
+    //       format: 'a4',
+    //       compress: true
+    //     });
+
+    //     pdf.addImage(
+    //       imageData,
+    //       'JPEG',
+    //       0,
+    //       0,
+    //       297,
+    //       210,
+    //       undefined,
+    //       'FAST'
+    //     );
+
+    //     pdf.save(
+    //       'JAMS_Certificate_' +
+    //       safeName(v('certificateId')) +
+    //       '_' +
+    //       safeName(v('recipient')) +
+    //       '.pdf'
+    //     );
+
+    //   } catch (err) {
+    //     console.error(err);
+
+    //     alert(
+    //       'PDF library could not load. The print dialog will open; please choose Save as PDF.'
+    //     );
+
+    //     window.print();
+
+    //   } finally {
+    //     btn.disabled = false;
+    //     btn.textContent = 'Download PDF';
+    //   }
+    // });
     $('download').addEventListener('click', async () => {
+
       if (!verify()) return;
 
       await populate();
@@ -798,43 +867,200 @@
       btn.textContent = 'Preparing High Quality PDF...';
 
       try {
+
         if (!window.html2canvas || !window.jspdf) {
-          throw Error('libraries unavailable');
+          throw new Error('PDF libraries unavailable');
         }
 
-        // High-resolution certificate rendering
+        /*
+         * ==========================================
+         * HIGH QUALITY CERTIFICATE RENDERING
+         * ==========================================
+         *
+         * A4 Landscape:
+         * 297mm x 210mm
+         *
+         * Higher scale = sharper text/logo/signature
+         */
         const canvas = await html2canvas($('certificate'), {
-          scale: 2,
+
+          scale: 2.2,
+
           useCORS: true,
+
           allowTaint: false,
+
           backgroundColor: '#fffdf8',
+
           logging: false,
-          imageTimeout: 15000
+
+          imageTimeout: 20000,
+
+          removeContainer: true
+
         });
 
-        const imageData = canvas.toDataURL('image/jpeg', 0.82);
 
-        const { jsPDF } = window.jspdf;
+        /*
+         * ==========================================
+         * CREATE PDF FUNCTION
+         * ==========================================
+         */
+        function createPDF(jpegQuality) {
 
-        const pdf = new jsPDF({
-          orientation: 'landscape',
-          unit: 'mm',
-          format: 'a4',
-          compress: true
-        });
+          const { jsPDF } = window.jspdf;
 
-        pdf.addImage(
-          imageData,
-          'JPEG',
-          0,
-          0,
-          297,
-          210,
-          undefined,
-          'FAST'
+          const pdf = new jsPDF({
+
+            orientation: 'landscape',
+
+            unit: 'mm',
+
+            format: 'a4',
+
+            compress: true
+
+          });
+
+          const imageData = canvas.toDataURL(
+            'image/jpeg',
+            jpegQuality
+          );
+
+          pdf.addImage(
+            imageData,
+            'JPEG',
+            0,
+            0,
+            297,
+            210,
+            undefined,
+            'FAST'
+          );
+
+          return pdf;
+        }
+
+
+        /*
+         * ==========================================
+         * AUTOMATIC PDF SIZE CONTROL
+         *
+         * Target:
+         * approximately 900 KB - 1.1 MB
+         * ==========================================
+         */
+
+        const qualities = [
+          0.92,
+          0.89,
+          0.86,
+          0.83,
+          0.80,
+          0.77,
+          0.74,
+          0.71,
+          0.68,
+          0.65
+        ];
+
+        const targetMin = 900 * 1024;   // 900 KB
+        const targetMax = 1100 * 1024;  // 1.1 MB
+        const targetIdeal = 1024 * 1024; // 1 MB
+
+        let selectedPDF = null;
+        let selectedSize = Infinity;
+        let selectedQuality = 0;
+
+
+        /*
+         * Try different JPEG qualities.
+         * The first PDF inside the target range
+         * will be selected.
+         */
+
+        for (const quality of qualities) {
+
+          const pdf = createPDF(quality);
+
+          const blob = pdf.output('blob');
+
+          const size = blob.size;
+
+          console.log(
+            'PDF Quality:',
+            quality,
+            'Size:',
+            (size / 1024).toFixed(1),
+            'KB'
+          );
+
+
+          /*
+           * Perfect target range found
+           */
+          if (
+            size >= targetMin &&
+            size <= targetMax
+          ) {
+
+            selectedPDF = pdf;
+            selectedSize = size;
+            selectedQuality = quality;
+
+            break;
+          }
+
+
+          /*
+           * Otherwise keep the closest
+           * PDF to 1 MB.
+           */
+          const currentDifference =
+            Math.abs(size - targetIdeal);
+
+          const selectedDifference =
+            Math.abs(selectedSize - targetIdeal);
+
+
+          if (
+            selectedPDF === null ||
+            currentDifference < selectedDifference
+          ) {
+
+            selectedPDF = pdf;
+            selectedSize = size;
+            selectedQuality = quality;
+
+          }
+
+        }
+
+
+        /*
+         * ==========================================
+         * SAVE FINAL PDF
+         * ==========================================
+         */
+
+        if (!selectedPDF) {
+          throw new Error('Could not create PDF');
+        }
+
+
+        console.log(
+          'FINAL PDF:',
+          (selectedSize / 1024).toFixed(1),
+          'KB'
         );
 
-        pdf.save(
+        console.log(
+          'JPEG QUALITY:',
+          selectedQuality
+        );
+
+
+        selectedPDF.save(
           'JAMS_Certificate_' +
           safeName(v('certificateId')) +
           '_' +
@@ -842,19 +1068,30 @@
           '.pdf'
         );
 
+
       } catch (err) {
-        console.error(err);
+
+        console.error(
+          'PDF generation error:',
+          err
+        );
 
         alert(
-          'PDF library could not load. The print dialog will open; please choose Save as PDF.'
+          'High-quality PDF could not be generated. ' +
+          'The print dialog will open; please choose Save as PDF.'
         );
 
         window.print();
 
+
       } finally {
+
         btn.disabled = false;
+
         btn.textContent = 'Download PDF';
+
       }
+
     });
     $('issuedDate').valueAsDate = new Date();
     $('publicationYear').value = new Date().getFullYear();
