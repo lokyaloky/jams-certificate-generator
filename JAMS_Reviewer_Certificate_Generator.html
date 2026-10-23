@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JAMS Reviewer Certificate Generator</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b2a5b'/%3E%3Ccircle cx='32' cy='32' r='18' fill='none' stroke='%23c9981f' stroke-width='3'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-size='26' font-weight='700' fill='%23c9981f' text-anchor='middle'%3EJ%3C/text%3E%3C/svg%3E">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--g900:#071d45;--g800:#0b2a5b;--g700:#1f4e96;--g600:#c9981f;--g200:#e6cf86;--g100:#f3ecd4;--g50:#f8f6ee;--ink:#1f2a3d;--muted:#5a6475}
+@page{size:A4 landscape;margin:0}
+*{box-sizing:border-box}
+html,body{margin:0;background:#eef1f6;color:var(--ink)}
+body{font-family:"Segoe UI",Arial,Helvetica,sans-serif}
+.app{max-width:1600px;margin:24px auto;padding:0 18px;display:grid;grid-template-columns:minmax(340px,440px) minmax(0,1fr);gap:22px;align-items:start}
+
+/* ---------- Form panel ---------- */
+.form-panel{background:#fff;border-radius:8px;box-shadow:0 4px 20px rgba(11,42,91,.14);border-top:5px solid var(--g800);overflow:hidden}
+.form-head{padding:22px 25px 16px;background:linear-gradient(180deg,var(--g50),#fff);border-bottom:1px solid #dde4ee}
+.form-head h1{margin:0 0 4px;font:700 23px Georgia,serif;color:var(--g800)}
+.form-head p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+form{padding:6px 25px 25px}
+fieldset{border:0;margin:0;padding:18px 0 4px;border-bottom:1px solid #e3e8f0}
+fieldset:last-of-type{border-bottom:0}
+legend{float:left;width:100%;margin:0 0 12px;padding:0;font:700 14px Georgia,serif;color:var(--g800)}
+legend::after{content:"";display:block;width:34px;height:2px;margin-top:5px;background:var(--g600)}
+.fields{clear:both;display:grid;gap:13px;padding-bottom:14px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+label{font-weight:700;font-size:12px;color:#1f3558}
+.required{color:#a5332b}
+.hint{font-size:11px;color:#78849a;line-height:1.35}
+input,select,textarea{width:100%;border:1px solid #bfc9d8;border-radius:4px;padding:10px;color:#1f2a3d;font:14px "Segoe UI",Arial,sans-serif;background:#fff;transition:border-color .15s}
+textarea{min-height:64px;resize:vertical}
+input[type=file]{padding:7px;font-size:12px;background:#f8f9fc}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid rgba(31,78,150,.3);outline-offset:1px;border-color:var(--g700)}
+input.invalid,textarea.invalid{border-color:#a5332b;background:#fff8f7}
+.id-row{display:grid;grid-template-columns:1fr auto;gap:8px}
+button{border:0;border-radius:4px;cursor:pointer;padding:11px 15px;font:700 13px "Segoe UI",Arial,sans-serif;transition:background .15s}
+button:disabled{opacity:.65;cursor:wait}
+.button-primary{background:var(--g800);color:#fff}.button-primary:hover{background:var(--g900)}
+.button-secondary{background:#fff;color:var(--g800);border:1px solid var(--g800)}.button-secondary:hover{background:var(--g50)}
+.button-accent{background:#b8871a;color:#fff}.button-accent:hover{background:#9a6f12}
+.actions{display:flex;gap:9px;flex-wrap:wrap;padding-top:18px;border-top:1px solid #e3e8f0}
+.actions .button-primary{flex:1}
+.error{display:none;margin:16px 25px 0;padding:10px 12px;border-left:4px solid #a5332b;background:#fff0ee;color:#85291f;font-size:13px;line-height:1.35}
+
+/* ---------- Preview ---------- */
+.preview-panel{min-width:0}
+.preview-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 11px}
+.preview-toolbar span{color:var(--muted);font-size:13px}
+.preview-actions{display:flex;gap:8px}
+.certificate-wrap{overflow:auto;padding:8px;background:#dbe3ef;box-shadow:0 4px 18px rgba(11,42,91,.12)}
+
+/* ---------- Certificate: sidebar layout ---------- */
+.certificate{position:relative;width:297mm;height:210mm;margin:0 auto;overflow:hidden;background:#fff;color:var(--ink)}
+
+.sidebar{position:absolute;left:0;top:0;bottom:0;width:66mm;padding:10mm 8mm 10mm;display:flex;flex-direction:column;align-items:center;color:#fff;text-align:center;background:linear-gradient(170deg,var(--g800) 0%,var(--g900) 100%)}
+.sidebar::after{content:"";position:absolute;top:0;right:0;bottom:0;width:2.2mm;background:var(--g600)}
+.logo-disc{width:49mm;height:49mm;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1.6mm #c9981f,0 0 5mm rgba(201,152,31,.5)}
+.logo{width:34mm;height:34mm;object-fit:contain;display:block}
+.logo-link{display:block;text-decoration:none}
+.journal-name{margin:5mm 0 0;font:700 16px/1.3 Georgia,"Times New Roman",serif;letter-spacing:.2px}
+.journal-tagline{margin:2mm 0 0;font-size:9.5px;line-height:1.4;color:var(--g200)}
+.sidebar-rule{width:18mm;height:1px;margin:3.5mm 0 4mm;background:rgba(255,255,255,.45)}
+.meta{width:100%;text-align:left;display:grid;gap:3mm}
+.meta div{padding-left:3mm;border-left:2px solid var(--g600)}
+.meta span{display:block;font-size:8.5px;color:var(--g200);margin-bottom:.6mm}
+.meta b{display:block;font:600 11px/1.3 "Segoe UI",Arial,sans-serif;overflow-wrap:anywhere}
+.sidebar-foot{margin-top:auto;font-size:9px;line-height:1.7;color:var(--g200)}
+.sidebar-foot a{color:var(--g200);text-decoration:underline;text-underline-offset:2px}
+.sidebar-foot a:hover{color:#fff}
+
+.main{position:absolute;left:66mm;right:0;top:0;bottom:0;padding:14mm 20mm 50mm 18mm;background:#fff;display:flex;flex-direction:column;justify-content:center}
+.main::before{content:"";position:absolute;inset:6mm 6mm 6mm 8mm;border:1.2px solid var(--g200);pointer-events:none}
+.watermark{position:absolute;left:52%;top:50%;transform:translate(-50%,-50%);color:var(--g800);opacity:.04;font:700 120px Georgia,serif;letter-spacing:10px;z-index:0}
+.main>*{position:relative;z-index:1}
+.main>.watermark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:0;white-space:nowrap;pointer-events:none}
+
+.tagline{display:flex;align-items:center;gap:3mm;margin:0 0 6mm;color:var(--g600);font:italic 600 15px Georgia,"Times New Roman",serif;letter-spacing:.4px}
+.tagline::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--g200),transparent)}
+.title{margin:0;text-align:left;color:var(--g800);font:700 42px/1.1 Georgia,"Times New Roman",serif;letter-spacing:.3px}
+.title-rule{width:34mm;height:3px;margin:5mm 0 8mm;background:var(--g600)}
+.presented{margin:0;color:var(--muted);font:400 13.5px "Segoe UI",Arial,sans-serif}
+.recipient{margin:2.5mm 0 5mm;padding-bottom:2mm;border-bottom:1.5px solid var(--g600);color:var(--g900);font:700 30px/1.15 Georgia,"Times New Roman",serif;overflow-wrap:anywhere}
+.recognition{margin:0;color:#2d384d;font:400 14px/1.6 Georgia,"Times New Roman",serif}
+.recognition b{color:var(--g800)}
+.role{color:var(--g800);font-weight:700}
+.article-box{margin:4mm 0;padding:3mm 5mm;background:var(--g50);border-left:3px solid var(--g700)}
+.article-label{display:block;margin-bottom:1mm;color:var(--g700);font:600 9.5px "Segoe UI",Arial,sans-serif}
+.article-title{color:var(--g900);font:700 14px/1.4 Georgia,"Times New Roman",serif;overflow-wrap:anywhere}
+.article-meta{margin-top:1.5mm;color:var(--muted);font:500 11px "Segoe UI",Arial,sans-serif}
+.article-meta:empty{display:none}
+.article-title:empty::before{content:"Article title will appear here";color:#9aa6b8;font-weight:400;font-style:italic}
+
+.signatures{position:absolute;left:18mm;right:20mm;bottom:17mm;display:flex;justify-content:space-between;align-items:flex-end}
+.signature{width:56mm;text-align:center;color:var(--g800);font:700 12.5px Georgia,"Times New Roman",serif}
+.signature-area{height:14mm;display:flex;align-items:flex-end;justify-content:center}
+.signature-img{display:none;max-width:50mm;max-height:13mm;width:auto;height:auto;object-fit:contain}
+.signature-line{height:1px;border-bottom:1px solid var(--g800);margin-bottom:2mm}
+.signature small{display:block;margin-top:.8mm;color:var(--muted);font:400 9.5px "Segoe UI",Arial,sans-serif}
+
+@media (max-width:1100px){.app{grid-template-columns:1fr;max-width:1000px}.preview-panel{order:2}}
+@media (max-width:600px){.app{margin:12px auto;padding:0 9px}form{padding:6px 16px 20px}.form-head{padding:18px 16px 14px}.row{grid-template-columns:1fr}.preview-toolbar{align-items:flex-start;flex-direction:column}.certificate-wrap{padding:4px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+html,body{background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.app>.form-panel,.preview-toolbar{display:none!important}
+.app{display:block;margin:0;padding:0;max-width:none}
+.certificate-wrap{padding:0;overflow:visible;box-shadow:none;background:#fff}
+.certificate{margin:0}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="form-panel">
+    <div class="form-head">
+      <h1>Reviewer Certificate Generator</h1>
+      <p>Fill in the details below. The certificate updates as you type. Fields marked with an asterisk are required.</p>
+    </div>
+    <div class="error" id="error" role="alert"></div>
+    <form id="certificateForm" novalidate>
+
+      <fieldset>
+        <legend>Reviewer details</legend>
+        <div class="fields">
+          <div class="field"><label for="recipient">Reviewer name <span class="required">*</span></label><input id="recipient" required placeholder="e.g., Dr. John Smith" autocomplete="off"></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Article details</legend>
+        <div class="fields">
+          <div class="field"><label for="articleTitle">Article title <span class="required">*</span></label><textarea id="articleTitle" required placeholder="Enter the full title of the reviewed article"></textarea></div>
+          <div class="row">
+            <div class="field"><label for="manuscriptId">Manuscript ID</label><input id="manuscriptId" placeholder="e.g., JAMS-2026-52"></div>
+            <div class="field"><label for="articleType">Article type</label>
+              <select id="articleType">
+                <option>Research Article</option><option>Review Article</option><option>Case Study</option><option>Short Communication</option><option>Conceptual Paper</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Certificate details</legend>
+        <div class="fields">
+          <div class="field"><label for="certificateId">Certificate ID <span class="required">*</span></label>
+            <div class="id-row"><input id="certificateId" required placeholder="JAMS-RC-2026-001"><button class="button-accent" type="button" id="autoId">Auto ID</button></div>
+            <span class="hint">Format: JAMS-RC-year-serial. Type your own serial number at the end.</span>
+          </div>
+          <div class="row">
+            <div class="field"><label for="reviewDate">Review completed</label><input id="reviewDate" type="date"></div>
+            <div class="field"><label for="issuedDate">Issued date <span class="required">*</span></label><input id="issuedDate" type="date" required></div>
+          </div>
+          <div class="field"><label for="contribution">Additional recognition <small>(optional)</small></label><textarea id="contribution" placeholder="Optional sentence added at the end of the certificate text"></textarea></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Signatories</legend>
+        <div class="fields">
+          <div class="row">
+            <div class="field"><label for="chiefName">Editor-in-Chief name</label><input id="chiefName" placeholder="e.g., Bhavishya Jasra"></div>
+            <div class="field"><label for="editorName">Editor name</label><input id="editorName" placeholder="Editor"></div>
+          </div>
+          <div class="row">
+            <div class="field"><label for="chiefSignature">Chief signature</label><input id="chiefSignature" type="file" accept="image/png,image/jpeg,image/webp"></div>
+            <div class="field"><label for="editorSignature">Editor signature</label><input id="editorSignature" type="file" accept="image/png,image/jpeg,image/webp"></div>
+          </div>
+          <span class="hint">Use a PNG with a transparent background for the cleanest signature.</span>
+        </div>
+      </fieldset>
+
+      <div class="actions">
+        <button class="button-primary" type="submit">Update certificate</button>
+        <button class="button-secondary" type="button" id="reset">Clear form</button>
+      </div>
+    </form>
+  </aside>
+
+  <section class="preview-panel">
+    <div class="preview-toolbar"><span>Preview, A4 landscape</span>
+      <div class="preview-actions">
+        <button class="button-secondary" type="button" id="print">Print certificate</button>
+        <button class="button-primary" type="button" id="download">Download PDF</button>
+      </div>
+    </div>
+    <div class="certificate-wrap">
+      <main class="certificate" id="certificate">
+
+        <aside class="sidebar">
+          <a class="logo-link" href="https://jamsjournal.org/" target="_blank" rel="noopener"><div class="logo-disc"><img class="logo" src="./JamsLogo.jpeg" alt="JAMS logo"></div></a>
+          <h1 class="journal-name">Journal of Advanced Multidisciplinary Studies</h1>
+          <p class="journal-tagline">A Multidisciplinary Scholarly Journal</p>
+          <div class="sidebar-rule"></div>
+          <div class="meta">
+            <div><span>Certificate ID</span><b id="certificateIdText">-</b></div>
+            <div><span>Manuscript ID</span><b id="manuscriptIdText">-</b></div>
+            <div><span>Article type</span><b id="articleTypeText">-</b></div>
+            <div><span>Review completed</span><b id="reviewDateText">-</b></div>
+            <div><span>Date of issue</span><b id="issuedDateText">-</b></div>
+          </div>
+          <div class="sidebar-foot"><a href="https://jamsjournal.org/" target="_blank" rel="noopener">jamsjournal.org</a><br><a href="mailto:info@jamsjournal.org">info@jamsjournal.org</a></div>
+        </aside>
+
+        <section class="main">
+          <div class="watermark">JAMS</div>
+          <div class="tagline">Peer Review Recognition</div>
+          <h2 class="title">Certificate of Peer Review</h2>
+          <div class="title-rule"></div>
+          <p class="presented">This certificate is proudly awarded to</p>
+          <div class="recipient" id="recipientText">Reviewer Name</div>
+          <p class="recognition">in recognition of their valuable contribution as a <span class="role">Peer Reviewer</span>
+            for the <b>Journal of Advanced Multidisciplinary Studies (JAMS)</b>, having completed a rigorous and constructive review of the manuscript titled:</p>
+          <div class="article-box">
+            <span class="article-label">Manuscript reviewed</span>
+            <div class="article-title" id="articleTitleText"></div>
+            <div class="article-meta" id="articleMetaText"></div>
+          </div>
+          <p class="recognition">Their expert evaluation and timely feedback supported the journal’s peer-review process and contributed to the advancement of academic research.<span id="contributionText"></span></p>
+
+          <div class="signatures">
+            <div class="signature">
+              <div class="signature-area"><img id="chiefSignatureImg" class="signature-img" alt=""></div>
+              <div class="signature-line"></div>
+              <span id="chiefText">Editor-in-Chief</span>
+              <small>Editor-in-Chief</small>
+            </div>
+            <div class="signature">
+              <div class="signature-area"><img id="editorSignatureImg" class="signature-img" alt=""></div>
+              <div class="signature-line"></div>
+              <span id="editorText">Editor</span>
+              <small>Editor</small>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </section>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const v = id => $(id).value.trim();
+const set = (id, text) => $(id).textContent = text;
+
+function fmtDate(d) {
+  if (!d) return '-';
+  const [y, m, day] = d.split('-');
+  return new Date(+y, +m - 1, +day).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+}
+function safeName(s) { return s.replace(/[^a-z0-9]+/gi, '_').replace(/^_|_$/g, '') || 'Reviewer'; }
+
+function loadSignature(inputId, imgId) {
+  const input = $(inputId), img = $(imgId), file = input.files && input.files[0];
+  if (!file) { img.removeAttribute('src'); img.style.display = 'none'; return Promise.resolve(); }
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = e => { img.src = e.target.result; img.style.display = 'block'; resolve(); };
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+function populate() {
+  const article = v('articleType');
+  set('recipientText', v('recipient') || 'Reviewer Name');
+  set('articleTitleText', v('articleTitle'));
+  set('articleMetaText', article + (v('manuscriptId') ? '  |  Manuscript ID: ' + v('manuscriptId') : ''));
+  set('contributionText', v('contribution') ? ' ' + v('contribution') : '');
+  set('certificateIdText', v('certificateId') || '-');
+  set('manuscriptIdText', v('manuscriptId') || '-');
+  set('articleTypeText', article);
+  set('reviewDateText', fmtDate(v('reviewDate')));
+  set('issuedDateText', fmtDate(v('issuedDate')));
+  set('chiefText', v('chiefName') || 'Editor-in-Chief');
+  set('editorText', v('editorName') || 'Editor');
+}
+async function populateAll() {
+  populate();
+  await Promise.all([loadSignature('chiefSignature', 'chiefSignatureImg'), loadSignature('editorSignature', 'editorSignatureImg')]);
+}
+
+function verify() {
+  const req = [['recipient', 'Reviewer name'], ['articleTitle', 'Article title'], ['certificateId', 'Certificate ID'], ['issuedDate', 'Issued date']];
+  const missing = [];
+  req.forEach(([id, name]) => { const bad = !v(id); $(id).classList.toggle('invalid', bad); if (bad) missing.push(name); });
+  const box = $('error');
+  if (missing.length) { box.textContent = 'Please complete: ' + missing.join(', ') + '.'; box.style.display = 'block'; return false; }
+  box.style.display = 'none';
+  return true;
+}
+
+function updateIdPrefix() {
+  const prefix = 'JAMS-RC-' + new Date().getFullYear() + '-';
+  const cur = v('certificateId');
+  if (!cur || /^JAMS-RC-\d{4}-?$/.test(cur)) $('certificateId').value = prefix;
+}
+
+// Live preview
+['recipient','articleTitle','manuscriptId','articleType','certificateId','reviewDate','issuedDate','contribution','chiefName','editorName']
+  .forEach(id => $(id).addEventListener('input', populate));
+['chiefSignature', 'editorSignature'].forEach(id => $(id).addEventListener('change', populateAll));
+
+$('certificateForm').addEventListener('submit', async e => { e.preventDefault(); if (verify()) await populateAll(); });
+
+$('autoId').addEventListener('click', () => {
+  $('certificateId').value = 'JAMS-RC-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 900) + 100);
+  populate();
+});
+
+$('reset').addEventListener('click', () => {
+  $('certificateForm').reset();
+  document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+  $('error').style.display = 'none';
+  $('issuedDate').valueAsDate = new Date();
+  updateIdPrefix();
+  populateAll();
+});
+
+$('print').addEventListener('click', async () => { if (verify()) { await populateAll(); window.print(); } });
+
+$('download').addEventListener('click', async () => {
+  if (!verify()) return;
+  await populateAll();
+  const btn = $('download');
+  btn.disabled = true; btn.textContent = 'Preparing PDF...';
+  try {
+    if (!window.html2canvas || !window.jspdf) throw Error('libraries unavailable');
+
+    const el = $('certificate');
+    const box = el.getBoundingClientRect();
+
+    // True 300 DPI for A4 landscape: 3508 x 2480 px. Print-grade sharpness.
+    const TARGET_W = 3508;
+    const TARGET_H = 2480;
+    const scale = Math.min(TARGET_W / box.width, TARGET_H / box.height);
+
+    const canvas = await html2canvas(el, {
+      scale,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+      imageTimeout: 0
+    });
+
+    // Resample only when deviation is more than 1px, with high-quality smoothing.
+    let outCanvas = canvas;
+    if (Math.abs(canvas.width - TARGET_W) > 1 || Math.abs(canvas.height - TARGET_H) > 1) {
+      outCanvas = document.createElement('canvas');
+      outCanvas.width = TARGET_W;
+      outCanvas.height = TARGET_H;
+      const ctx = outCanvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, TARGET_W, TARGET_H);
+      ctx.drawImage(canvas, 0, 0, TARGET_W, TARGET_H);
+    }
+
+    // PNG = lossless. No chroma subsampling, no JPEG artifacts on text/borders.
+    const imgData = outCanvas.toDataURL('image/png');
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
+    pdf.addImage(imgData, 'PNG', 0, 0, 297, 210, undefined, 'FAST');
+
+    // Clickable links (logo + footer) mapped to PDF coordinates
+    const k = 297 / box.width;
+    el.querySelectorAll('a[href]').forEach(a => {
+      const r = a.getBoundingClientRect();
+      pdf.link((r.left - box.left) * k, (r.top - box.top) * k, r.width * k, r.height * k, { url: a.href });
+    });
+
+    pdf.save('JAMS_Reviewer_Certificate_' + safeName(v('certificateId')) + '_' + safeName(v('recipient')) + '.pdf');
+  } catch (err) {
+    console.error(err);
+    alert('PDF library could not load. The print dialog will open; please choose Save as PDF.');
+    window.print();
+  } finally { btn.disabled = false; btn.textContent = 'Download PDF'; }
+});
+
+$('issuedDate').valueAsDate = new Date();
+updateIdPrefix();
+populate();
+</script>
+</body>
+</html>
