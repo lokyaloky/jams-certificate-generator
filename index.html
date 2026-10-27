@@ -657,7 +657,7 @@
           <div class="bottom-rule"></div>
           <div class="watermark">JAMS</div>
           <header class="certificate-header"><img class="logo"
-              src="https://jamsjournal.org/public/journals/1/pageHeaderLogoImage_en.png" alt="JAMS logo">
+              src="./jams-logo.png" alt="JAMS logo">
             <div>
               <h1 class="journal-name">Journal of Advanced Multidisciplinary Studies</h1>
               <p class="journal-tagline">JAMS - A Multidisciplinary Scholarly Journal</p>
@@ -856,6 +856,7 @@
     //     btn.textContent = 'Download PDF';
     //   }
     // });
+
     $('download').addEventListener('click', async () => {
 
       if (!verify()) return;
@@ -882,6 +883,7 @@
          *
          * Higher scale = sharper text/logo/signature
          */
+        
         const canvas = await html2canvas($('certificate'), {
 
           scale: 2.2,
